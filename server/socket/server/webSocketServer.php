@@ -204,7 +204,7 @@ class webSocketServer {
                             if($message != '')
                             {
                                 $decoded = json_decode($message);
-                                if(is_object($decoded) && isset($decoded->password) && $decoded->password == $this->password)
+                                if(is_object($decoded) && isset($decoded->password) && strlen($decoded->password) == $this->password)
                                 {
                                     $pwiscorrect = true;
                                     $Client->needPW = false;
