@@ -57,11 +57,8 @@ static class WSClient_Example
 	[ConCmd.Server( "wsc_send" )]
 	public async static void send_example_wsc()
 	{
-		if ( WSC is null || !WSC.WS.IsConnected )
-		{
-			Log.Error( WSC is null ? "WSClient is not created yet" : $"WSClient is not connected to {WSC.settings.SocketID}" );
-			return;
-		}
+		if ( !WSC?.isReady() ?? true )
+			return; //Log.Error( WSC is null ? "WSClient is not created yet" : $"WSClient is not connected to {WSC.settings.SocketID}" );
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Example 1 (echo):

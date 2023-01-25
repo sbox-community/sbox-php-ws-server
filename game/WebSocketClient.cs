@@ -189,7 +189,7 @@ public partial class WSClient
 
 	public async Task<Packet> Send( string message, bool waitResult = true )
 	{
-		if ( !WS.IsConnected )
+		if ( !WS?.IsConnected ?? true )
 		{
 			Log.Info( $"[{settings.SocketID}] Not connected. Sending failed" );
 			return null;
@@ -254,4 +254,6 @@ public partial class WSClient
 		if ( TCS.TryGetValue( package.uid, out var _ ) )
 			TCS[package.uid].SetResult( package );
 	}
+
+	public bool isReady() => WS?.IsConnected ?? false;
 }
