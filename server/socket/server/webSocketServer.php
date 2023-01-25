@@ -7,7 +7,6 @@ class webSocketServer {
     use RFC_6455; // TRAIT to implement methods required by RFC6455
 
     public
-            $password = 'test',
             $logging = '',
             $Sockets = [],
             $bufferLength = 10 * 4096,
@@ -24,6 +23,7 @@ class webSocketServer {
             $maxChunks = 100, // avoid flooding during bufferON
             $maxClients = 0;  // 0=no limit
     protected
+            $password = 'test',
             $Address,
             $Port,
             $socketMaster,
