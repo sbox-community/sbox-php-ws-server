@@ -1,5 +1,5 @@
 # sbox-php-ws-server
-PHP Websocket Server, no dependencies, no installation, drag and drop, ready to use for **Database** :tada: access of your s&amp;box server.
+PHP Websocket Server, no dependencies, no installation, drag and drop, ready to use for **Database** access :tada: of your s&amp;box server.
 
 If you have s&box server(s) and a PHP web server, this websocket server will provide a best solution to your organization/community.
 
@@ -12,7 +12,7 @@ Other features are;
 
 ___
 
-# Configurate:
+# Configuration:
 For WebServer;
 - Drag and drop "server/socket" folder to your web server on FTP.
 - (If your game server and web server is not on the same machine) Edit 'websock.ini' and change localhost to web server's ip.
