@@ -136,10 +136,10 @@ static class WSClient_Example
 		Log.Info( $"SQL Result: {(SQLVal?.message ?? "error/connection problem")}" );
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Example 4 (custom query):
+		// Example 4:
 
 		Log.Info( "" );
-		Log.Info( "Example 4 (custom query):" );
+		Log.Info( "Example 4:" );
 
 		SQLVal = await WSC.Send(
 			new Packet()
@@ -165,10 +165,10 @@ static class WSClient_Example
 
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Example 5 (simple query):
+		// Example 5:
 
 		Log.Info( "" );
-		Log.Info( "Example 5 (simple query):" );
+		Log.Info( "Example 5:" );
 
 		// Not safe way, you prevent sql injection codes, sanitize them.
 		// SqlCommand as parameterized is blacklisted, unfortunately can not use.
