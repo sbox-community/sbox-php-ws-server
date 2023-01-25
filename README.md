@@ -48,12 +48,12 @@ Echo: IOYCJXHTGW
 Echo: 8G2WMB2GZ3
 Echo: J18Y0R0YZD
 
-Example 2 (without result, good enough for logging):
+Example 2:
 
 Example 3 (parameterized query):
 SQL Result: OK
 
-Example 4 (custom query):
+Example 4:
 SQL Result: (5)
 15334321 : unsafe_nick
 86305273 : unsafe_nick
@@ -61,7 +61,7 @@ SQL Result: (5)
 1133568487 : unsafe_nick
 1282368640 : unsafe_nick
 
-Example 5 (simple query):
+Example 5:
 SQL Result: (8)
 create a table: []
 select: []
