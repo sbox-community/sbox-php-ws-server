@@ -1,36 +1,37 @@
 # sbox-php-ws-server
-PHP Websocket Server, no dependencies, no installation, drag and drop, ready to use for database access of your s&amp;box server.
+PHP Websocket Server, no dependencies, no installation, drag and drop, ready to use for **Database** :tada: access of your s&amp;box server.
 
 If you have s&box server(s) and a PHP web server, this websocket server will provide a best solution to your organization/community.
 
 Also you can benefit for another application from your web server. With websocket, you can even run your custom networked s&box server.
 
 Other features are;
--Can connect another client(s) (like other game servers, player's client, websites, web browser connections..) and communicate between via the websocket server. (broadcasting, etc..)
--IP blocking and password securing. ( Strongly advised use CDN like cloudflare in order to prevent DDOS attacks )
--PHP Server's other important features..
+- Can connect another client(s) (like other game servers, player's client, websites, web browser connections..) and communicate between via the websocket server. (broadcasting, etc..)
+- IP blocking and password securing. ( Strongly advised use CDN like cloudflare in order to prevent DDOS attacks )
+- PHP Server's other important features..
+
 ___
 
 # Configurate:
 For WebServer;
--Drag and drop "server/socket" folder to your web server on FTP.
--(If your game server and web server is not on the same machine) Edit 'websock.ini' and change localhost to web server's ip.
--Edit 'webSocketServer.php' and change $password = 'test'
--You can find the implementations of the examples on 'resourceDefault.php'
--For further information, read "server/README.md" and go to phpWebSocketServer's github link below.
+- Drag and drop "server/socket" folder to your web server on FTP.
+- (If your game server and web server is not on the same machine) Edit 'websock.ini' and change localhost to web server's ip.
+- Edit 'webSocketServer.php' and change $password = 'test'
+- You can find the implementations of the examples on 'resourceDefault.php'
+- For further information, read "server/README.md" and go to phpWebSocketServer's github link below.
 
 For GameServer;
--Drag and drop the files inside 'game' folder to your gamemode files "code/".
--Edit 'WSClient_Example.cs' from line 23. and read also the comments.
--For testing, use these concommands; wsc_connect, wsc_send and wsc_disconnect
--Now it's your turn, integrate to your gamemode like the examples.
+- Drag and drop the files inside 'game' folder to your gamemode files "code/".
+- Edit 'WSClient_Example.cs' from line 23. and read also the comments.
+- For testing, use these concommands; wsc_connect, wsc_send and wsc_disconnect
+- Now it's your turn, integrate to your gamemode like the examples.
 
 # Notes:
--Tested only PHP 8.1.2, 8.2
+- Tested only PHP 8.1.2, 8.2
 
 # Example:
 
-Output for https://github.com/sbox-community/sbox-php-ws-server/blob/main/game/WSClient_Example.cs
+Output for [https://github.com/sbox-community/sbox-php-ws-server/blob/main/game/WSClient_Example.cs](https://github.com/sbox-community/sbox-php-ws-server/blob/main/game/WSClient_Example.cs#L58)
 
 ```c#
 > wsc_connect
