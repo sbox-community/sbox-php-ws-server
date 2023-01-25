@@ -27,7 +27,7 @@ For GameServer;
 - Now it's your turn, integrate to your gamemode like the examples.
 
 # Notes:
-- Tested only PHP 8.1.2, 8.2
+- Tested on PHP 8.1.2, 8.2
 
 # Example:
 
