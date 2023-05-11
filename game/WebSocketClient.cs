@@ -115,11 +115,10 @@ public partial class WSClient
 
 			if ( settings.WakeupPHPServer )
 			{
-				using ( var http = Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}" ))
+				using ( var http = Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}" ) )
 				{
 					try
 					{
-						_ = http.GetBytesAsync();
 						await Task.Delay( settings.phpServerWakeupDelay, CTS.Token );
 					}
 					catch ( ArgumentException e )
