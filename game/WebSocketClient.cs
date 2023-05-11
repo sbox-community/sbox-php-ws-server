@@ -115,7 +115,7 @@ public partial class WSClient
 
 			if ( settings.WakeupPHPServer )
 			{
-				using ( var http = Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}" ) )
+				using ( var http = Sandbox.Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}" ) )
 				{
 					try
 					{
@@ -125,8 +125,6 @@ public partial class WSClient
 					{
 						Log.Info( $"[{settings.SocketID}] Wakeup failed. Error: {e.Message}" );
 					}
-
-					http.Dispose();
 				}
 			}
 
