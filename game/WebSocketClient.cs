@@ -4,7 +4,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Sandbox;
-using Sandbox.Internal;
 
 public partial class WSClient
 {
@@ -116,7 +115,7 @@ public partial class WSClient
 
 			if ( settings.WakeupPHPServer )
 			{
-				using ( var http = new Http( new Uri( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}" ) ) )
+				using ( var http = Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}" ))
 				{
 					try
 					{
