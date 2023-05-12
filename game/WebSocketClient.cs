@@ -22,6 +22,7 @@ public partial class WSClient
 		public bool Secure { get; set; } = false;
 		public string SocketID { get; set; } = "My Websocket Client"; // Just for identification, not connection related
 		public int maxMessageSize { get; set; } = 65536; // Byte (64KB)
+		public int connectionDelay { get; set; } = 3000; // MS
 		public bool Reconnect { get; set; } = true; // Reconnect after any disconnection
 		public int reconnectDelay { get; set; } = 1000; // MS
 		public bool Retry { get; set; } = true; // Retry to connect even if server do not respond
@@ -29,6 +30,7 @@ public partial class WSClient
 		public int sendDelay { get; set; } = 10; // MS, We must wait some time in order to avoid happening annoying problems like losing packets
 		public int resultTimeout { get; set; } = 3000; // MS, If server do not respond your expected result, we will terminate this expectation
 		public bool WakeupPHPServer { get; set; } = true; // If you do not use to run like "php runSocketserver.php -console" in your PHP socket server, you have to enable this.
+		public int PHPServerconnectionDelay { get; set; } = 3000; // MS
 		public string phpServerPath { get; set; } = "socket/server/runSocketServer.php";
 		public int phpServerWakeupDelay { get; set; } = 3000; // MS
 		public bool debug { get; set; } = false;
@@ -107,15 +109,19 @@ public partial class WSClient
 
 		try
 		{
-			await WS.Connect( server );
+			CancellationTokenSource CT = new CancellationTokenSource();
+			CT.CancelAfter( settings.connectionDelay );
+			await WS.Connect( server, CT.Token );
 		}
-		catch( System.InvalidOperationException ex )
+		catch
 		{
-			Log.Info( $"[{settings.SocketID}] Connection failed. {ex.Message}" );
+			Log.Info( $"[{settings.SocketID}] Connection failed." );
 
 			if ( settings.WakeupPHPServer )
 			{
-				using ( var http = Sandbox.Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}" ) )
+				CancellationTokenSource CT = new CancellationTokenSource();
+				CT.CancelAfter( settings.PHPServerconnectionDelay );
+				using ( var http = Sandbox.Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}", cancellationToken: CT.Token ))
 				{
 					try
 					{

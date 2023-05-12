@@ -19,11 +19,11 @@ For WebServer;
 - Edit 'webSocketServer.php' and change $password = 'test'
 - You can find the implementations of the examples on 'resourceDefault.php'
 - For further information, read "server/README.md" and go to phpWebSocketServer's github link below.
-- Don't forget to add your url to gamemode's Http allow list https://wiki.facepunch.com/sbox/http
 
 For GameServer;
 - Drag and drop the files inside 'game' folder to your gamemode files "code/".
 - Edit 'WSClient_Example.cs' from line 23. and read also the comments.
+- Add your url to gamemode's Http allow list https://wiki.facepunch.com/sbox/http
 - For testing, use these concommands; wsc_connect, wsc_send and wsc_disconnect
 - Now it's your turn, integrate to your gamemode like the examples.
 
