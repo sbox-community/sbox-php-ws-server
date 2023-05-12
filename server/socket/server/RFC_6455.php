@@ -180,7 +180,7 @@ trait RFC_6455 {
         }
         $this->Log("Handshake: " . $Headers['get'] . "Client");
 
-        foreach (['host', 'origin', 'sec-websocket-key', 'upgrade', 'connection', 'sec-websocket-version'] as $key) {
+        foreach (['host', 'sec-websocket-key', 'upgrade', 'connection', 'sec-websocket-version'] as $key) { //for sbox 'origin' is removed for temporary
             if (isset($Headers[$key]) === false) {
                 fwrite($Socket, "HTTP/1.1 400 Bad Request", strlen("HTTP/1.1 400 Bad Request"));
                 $this->onError($SocketID, "Handshake aborted - HTTP/1.1 400 Bad Request");

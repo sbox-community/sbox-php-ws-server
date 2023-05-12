@@ -19,6 +19,7 @@ For WebServer;
 - Edit 'webSocketServer.php' and change $password = 'test'
 - You can find the implementations of the examples on 'resourceDefault.php'
 - For further information, read "server/README.md" and go to phpWebSocketServer's github link below.
+- Don't forget to add your url to gamemode's Http allow list https://wiki.facepunch.com/sbox/http
 
 For GameServer;
 - Drag and drop the files inside 'game' folder to your gamemode files "code/".

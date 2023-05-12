@@ -109,9 +109,9 @@ public partial class WSClient
 		{
 			await WS.Connect( server );
 		}
-		catch
+		catch( System.InvalidOperationException ex )
 		{
-			Log.Info( $"[{settings.SocketID}] Connection failed." );
+			Log.Info( $"[{settings.SocketID}] Connection failed. {ex.Message}" );
 
 			if ( settings.WakeupPHPServer )
 			{

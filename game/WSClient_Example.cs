@@ -21,7 +21,7 @@ static class WSClient_Example
 			// Example: ws://localhost:8095/ or wss://localhost:8095/endpoint
 
 			Adress = "localhost", // Reading from file recommended. 
-			Port = "8095",
+			Port = "8443",
 			Endpoint = "", // Reading from file recommended
 			serverPassword = "test", // Reading from file recommended
 			Secure = false,
