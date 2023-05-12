@@ -33,6 +33,7 @@ public partial class WSClient
 		public int PHPServerconnectionDelay { get; set; } = 1000; // MS
 		public string phpServerPath { get; set; } = "socket/server/runSocketServer.php";
 		public int phpServerWakeupDelay { get; set; } = 3000; // MS
+		public int QueueDelay { get; set; } = 1000; // MS
 		public bool debug { get; set; } = false;
 	}
 
@@ -75,7 +76,7 @@ public partial class WSClient
 			await Task.Delay( settings.reconnectDelay, CTS.Token );
 			Shutdown();
 			Create();
-			_ = Connect(); // might be stack overflow
+			_ = Connect(); // might be stack overflow, if so, use Connect as main loop for connection
 		}
 		else
 			Shutdown();
@@ -83,78 +84,83 @@ public partial class WSClient
 
 	public async Task<bool> Connect()
 	{
-		await Task.Yield();
+		while( !CTS.IsCancellationRequested )
+		{ 
+			await Task.Yield();
 
-		if ( CTS.IsCancellationRequested )
-		{
-			CTS?.Dispose();
-			Log.Info( $"[{settings.SocketID}] Stopped.." );
-			return false;
-		}
-
-		if ( WS is null )
-		{
-			Log.Info( $"[{settings.SocketID}] Already removed.." );
-			return true;
-		}
-
-		if ( WS is not null && WS.IsConnected )
-		{
-			Log.Info( $"[{settings.SocketID}] Already connected.." );
-			return true;
-		}
-
-		var server = $"{(settings.Secure ? "wss" : "ws")}://{settings.Adress}:{settings.Port}/{settings.Endpoint}";
-		Log.Info( $"[{settings.SocketID}] Connecting to server. ({server})" );
-
-		try
-		{
-			CancellationTokenSource CT = new CancellationTokenSource();
-			CT.CancelAfter( settings.connectionDelay );
-			await WS.Connect( server, CT.Token );
-		}
-		catch
-		{
-			Log.Info( $"[{settings.SocketID}] Connection failed." );
-
-			if ( settings.WakeupPHPServer )
+			if ( CTS.IsCancellationRequested )
 			{
-				CancellationTokenSource CT = new CancellationTokenSource();
-				CT.CancelAfter( settings.PHPServerconnectionDelay );
-				using ( var http = Sandbox.Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}", cancellationToken: CT.Token ))
-				{
-					try
-					{
-						await Task.Delay( settings.phpServerWakeupDelay, CTS.Token );
-					}
-					catch ( ArgumentException e )
-					{
-						Log.Info( $"[{settings.SocketID}] Wakeup failed. Error: {e.Message}" );
-					}
-				}
-			}
-
-			if ( settings.Retry || settings.WakeupPHPServer )
-			{
-				Log.Info( $"[{settings.SocketID}] Retrying: {settings.Retry}, Wakingup: {settings.WakeupPHPServer}" );
-
-				await Task.Delay( settings.retryDelay, CTS.Token );
-				Shutdown();
-				Create();
-				_ = Connect(); // might be stack overflow
-				await Task.Yield();
-
+				CTS?.Dispose();
+				Log.Info( $"[{settings.SocketID}] Stopped.." );
 				return false;
 			}
-			else
-				Log.Info( $"[{settings.SocketID}] Terminated." );
+
+			if ( WS is null )
+			{
+				Log.Info( $"[{settings.SocketID}] Already removed.." );
+				return true;
+			}
+
+			if ( WS is not null && WS.IsConnected )
+			{
+				Log.Info( $"[{settings.SocketID}] Already connected.." );
+				return true;
+			}
+
+			var server = $"{(settings.Secure ? "wss" : "ws")}://{settings.Adress}:{settings.Port}/{settings.Endpoint}";
+			Log.Info( $"[{settings.SocketID}] Connecting to server. ({server})" );
+
+			try
+			{
+				CancellationTokenSource CT = new CancellationTokenSource();
+				CT.CancelAfter( settings.connectionDelay );
+				await WS.Connect( server, CT.Token );
+			}
+			catch
+			{
+				Log.Info( $"[{settings.SocketID}] Connection failed." );
+
+				if ( settings.WakeupPHPServer )
+				{
+					CancellationTokenSource CT = new CancellationTokenSource();
+					CT.CancelAfter( settings.PHPServerconnectionDelay );
+					using ( var http = Sandbox.Http.RequestBytesAsync( $"{(settings.Secure ? "https" : "http")}://{settings.Adress}/{settings.phpServerPath}", cancellationToken: CT.Token ))
+					{
+						try
+						{
+							await Task.Delay( settings.phpServerWakeupDelay, CTS.Token );
+						}
+						catch ( ArgumentException e )
+						{
+							Log.Info( $"[{settings.SocketID}] Wakeup failed. Error: {e.Message}" );
+						}
+						catch
+						{
+							Log.Info( $"[{settings.SocketID}] Wakeup failed. Error: unknown" );
+						}
+					}
+				}
+
+				if ( settings.Retry || settings.WakeupPHPServer )
+				{
+					Log.Info( $"[{settings.SocketID}] Retrying: {settings.Retry}, Wakingup: {settings.WakeupPHPServer}" );
+
+					await Task.Delay( settings.retryDelay, CTS.Token );
+					Shutdown();
+					Create();
+					continue;
+				}
+				else
+					Log.Info( $"[{settings.SocketID}] Terminated." );
+			}
+
+			await WS.Send( $"{{\"password\":\"{settings.serverPassword}\"}}" );
+
+			Log.Info( $"[{settings.SocketID}] Login request has sended to websocket. Ready to use." );		
+
+			return WS.IsConnected;
 		}
-
-		await WS.Send( $"{{\"password\":\"{settings.serverPassword}\"}}" );
-
-		Log.Info( $"[{settings.SocketID}] Login request has sended to websocket. Ready to use." );
-
-		return WS.IsConnected;
+		return false;
 	}
 
 	public void Shutdown( bool sendCloseFrame = false )
@@ -189,12 +195,20 @@ public partial class WSClient
 		Log.Info( $"[{settings.SocketID}] Socket Closed." );
 	}
 
-	public async Task<Packet> Send( string message, bool waitResult = true )
+	public async Task<Packet> Send( string message, bool waitResult = true, bool queryQueue = false )
 	{
 		if ( !WS?.IsConnected ?? true )
 		{
-			Log.Info( $"[{settings.SocketID}] Not connected. Sending failed" );
-			return null;
+			Log.Info( $"[{settings.SocketID}] Not connected. Sending failed{(queryQueue?", queued!":"")}" );
+
+			if ( queryQueue )
+			{
+				await Task.Delay( settings.QueueDelay );
+				return await Send( message, waitResult, true );
+			}
+			else
+				return null;
+
 		}
 		var diff = Time.Now - lastSend;
 		lastSend = Time.Now;
@@ -219,14 +233,28 @@ public partial class WSClient
 			}
 			catch ( TaskCanceledException )
 			{
-				Log.Info( $"[{settings.SocketID}] Sending package is cancelled." );
+				Log.Info( $"[{settings.SocketID}] Sending package is cancelled. {(queryQueue ? "Queued!" : "")}" );
 			}
 			catch ( TimeoutException )
 			{
-				Log.Info( $"[{settings.SocketID}] Sending package is timeout." );
+				Log.Info( $"[{settings.SocketID}] Sending package is timeout. {(queryQueue ? "Queued!" : "")}" );
 			}
-			_ = TCS.Remove( uid );
-			return null;
+			catch
+			{
+				Log.Info( $"[{settings.SocketID}] Sending package is failed due to unknown error. {(queryQueue ? "Queued!" : "")}" );
+			}
+
+			if ( queryQueue )
+			{
+				_ = TCS.Remove( uid );
+				await Task.Delay( settings.QueueDelay );
+				return await Send( message, waitResult, true );
+			}
+			else
+			{
+				_ = TCS.Remove( uid );
+				return null;
+			}
 		}
 		else
 		{
@@ -239,7 +267,7 @@ public partial class WSClient
 		}
 	}
 
-	public async Task<Packet> Send( Packet message, bool waitResult = true ) => _ = await Send( JsonSerializer.Serialize( message ), waitResult );
+	public async Task<Packet> Send( Packet message, bool waitResult = true, bool queryQueue = false ) => _ = await Send( JsonSerializer.Serialize( message ), waitResult, queryQueue );
 
 	private async void MessageReceived( string message )
 	{
